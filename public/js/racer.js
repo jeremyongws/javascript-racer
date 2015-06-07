@@ -1,137 +1,59 @@
-var player1position = 0
-var player2position = 0
+// var player1position = 0
+// var player2position = 0
 
 $(document).ready(function() {
   // ('p').each.style.display = "none";
-  var $strips = $(this).find('tr')
-  var $cells1 = $strips[0].getElementsByTagName("td")
-  var $cells2 = $strips[1].getElementsByTagName("td")
-  $cells1[player1position].className = "active";
-  $cells2[player2position].className = "active";
+  var $strips = $(this).find('tr');
+  var $cells1 = $strips[0].getElementsByTagName("td");
+  var $cells2 = $strips[1].getElementsByTagName("td");
+  var player1_id = $("#race").data("playerone-id");
+  var player2_id = $("#race").data("playertwo-id");
+  // $cells1[player1position].className = "active";
+  // $cells2[player2position].className = "active";
 
-  var Stopwatch = function(elem, options) {
+  function Player(playernum){
+    this.playernum = playernum;
+    this.position = 0;
 
-      var timer       = createTimer(),
-          startButton = createButton("start", start),
-          stopButton  = createButton("stop", stop),
-          resetButton = createButton("reset", reset),
-          offset,
-          clock,
-          interval;
+    this.move = function() {
+      var position = $('player' + playernum + '_strip' + " td.active").index();
+        $('player' + this.playernum + '_strip' + " td").eq(position).removeClass('active');
+        $('player' + this.playernum + '_strip' + " td").eq(position+1).addClass('active');
+        this.position = $('player' + this.playernum + '_strip' + " td.active").index();
+    }
+  }
+  
+  $('tr td:first-child').addClass("active");
 
-      // default options
-      options = options || {};
-      options.delay = options.delay || 1;
+  function Game(player1, player2){
+    this.player1 = player1;
+    this.player2 = player2;
 
-      // append elements     
-      elem.appendChild(timer);
-
-      // initialize
-      reset();
-
-      // private functions
-      function createTimer() {
-        return document.createElement("span");
-      }
-
-      function createButton(action, handler) {
-        var a = document.createElement("a");
-        a.href = "#" + action;
-        a.innerHTML = action;
-        a.addEventListener("click", function(event) {
-          handler();
-          event.preventDefault();
-        });
-        return a;
-      }
-
-      function start() {
-        if (!interval) {
-          offset   = Date.now();
-          interval = setInterval(update, options.delay);
+    this.onKeyUp = function() {
+      switch(parseInt(key.which,10)) {
+        case 81:
+        debugger
+        this.player1.move();
+        if(checkIfWon(1)) {
+          parseWinner($cells1, this.player2.position)
         }
-      }
+        break;
 
-      function stop() {
-        if (interval) {
-          clearInterval(interval);
-          interval = null;
+        case 80:        
+        this.player2.move();
+        if(checkIfWon(2)) {
+          parseWinner($cells2, this.player1.position)
         }
-      }
+        break;
+      };
+    }
+  }
 
-      function reset() {
-        clock = 0;
-        render();
-      }
-
-      function update() {
-        clock += delta();
-        render();
-      }
-
-      function render() {
-        timer.innerHTML = clock/1000; 
-      }
-
-      function delta() {
-        var now = Date.now(),
-            d   = now - offset;
-
-        offset = now;
-        return d;
-      }
-
-      function time() {
-        return clock;
-      }
-
-      // public API
-      this.time = time;
-      this.start = start;
-      this.stop = stop;
-      this.reset = reset;
-   };
-
-  function movement(player_track){
-  // var $strips = $(document).find('tr')
-  // var $cells1 = $strips[0].getElementsByTagName("td")
-  // var $cells2 = $strips[1].getElementsByTagName("td")
-    if (player1position > $cells1.length-1 || player2position > $cells2.length-1) {
-        // $(document).find("winner").style.display = "initial";
-        if (player1position > $cells1.length-1) {
-          this.stop
-          parseWinner($cells1, player2position) // refer to below function for clarity
-        }
-        else {
-          this.stop
-          parseWinner($cells2, player1position)
-        }
-    } else {
-      // $(document).find('p')[0].css('display: initial')
-      if (player_track === $cells1) {
-        if (player1position === 0) {
-          this.start
-          $cells1[player1position].className = "";
-          $cells1[player1position+1].className = "active";
-            // debugger
-        } else {
-          $cells1[player1position-1].className = "";
-          $cells1[player1position].className = "active";
-        }
-        player1position += 1
-      }
-
-      if (player_track === $cells2) {
-        if (player2position === 0) {
-          this.start
-          $cells2[player2position].className = "";
-          $cells2[player2position].className = "active";
-        } else {
-          $cells2[player2position-1].className = "";
-          $cells2[player2position].className = "active";
-        }
-        player2position += 1
-      }
+  function checkIfWon(playernum) {
+    var position = $("#row" + id + " td.active").index();
+    var length = $("#row" + id + " td").length
+    if(position + 1 === length){
+      return true
     }
   }
 
@@ -160,24 +82,22 @@ $(document).ready(function() {
                "winner_id": player1_id, 
                "loser_index": loser_index}
         }).done(function(e){
-        console.log("wtfwtf")
         window.location = "/winner/" + race_id
       })
     }
-
   }
 
-  // what defines an event?
-  // is event an object?
+  var game = new Game(new Player(1), new Player(2));
+  alert(Player(1))
 
   $(document).keydown(function(key) {
     switch(parseInt(key.which,10)) {
       case 81:
-      movement($cells1);
+      move($cells1);
         break;
 
       case 80:
-      movement($cells2);
+      move($cells2);
         break;
     };
   });
