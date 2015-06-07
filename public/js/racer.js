@@ -97,7 +97,7 @@ $(document).ready(function() {
   // var $cells1 = $strips[0].getElementsByTagName("td")
   // var $cells2 = $strips[1].getElementsByTagName("td")
     if (player1position > $cells1.length-1 || player2position > $cells2.length-1) {
-        $(document).find("winner").style.display = "initial";
+        // $(document).find("winner").style.display = "initial";
         if (player1position > $cells1.length-1) {
           this.stop
           parseWinner($cells1, player2position) // refer to below function for clarity
@@ -108,7 +108,7 @@ $(document).ready(function() {
         }
     } else {
       // $(document).find('p')[0].css('display: initial')
-      if (playernum === $cells1) {
+      if (player_track === $cells1) {
         if (player1position === 0) {
           this.start
           $cells1[player1position].className = "";
@@ -121,7 +121,7 @@ $(document).ready(function() {
         player1position += 1
       }
 
-      if (playernum === $cells2) {
+      if (player_track === $cells2) {
         if (player2position === 0) {
           this.start
           $cells2[player2position].className = "";
@@ -136,27 +136,32 @@ $(document).ready(function() {
   }
 
   function parseWinner(player_track, loser_index) {
-    var game_id = $("#game").data("game-id")
+    var race_id = $("#race").data("race-id")
+    var player1_id = $("#race").data("playerone-id")
+    var player2_id = $("#race").data("playertwo-id")
     if (player_track === $cells1) {
-      var loser = 2
+      // debugger
       $.ajax({
         type: "PUT",
-        url: "/game"
-        data: {"game_id": game_id, "winner_id": 1, "loser_index": loser_index, "time_spent": this.time}
-      })
-      .done(function(e){
-        window.location = "/game/" + game_id
+        url: "/race",
+        data: {"race_id": race_id, 
+               "winner_id": player1_id, 
+               "loser_index": loser_index}
+        }).done(function(e){
+        // e.preventDefault();
+        window.location = "/winner/" + race_id
       })
     }
     else {
-      var loser = 1
       $.ajax({
         type: "PUT",
-        url: "/game"
-        data: {"game_id": game_id, "winner_id": 2, "loser_index": loser_index}
-      })
-      .done(function(e){
-        window.location = "/game/" + game_id
+        url: "/race",
+        data: {"race_id": race_id, 
+               "winner_id": player1_id, 
+               "loser_index": loser_index}
+        }).done(function(e){
+        console.log("wtfwtf")
+        window.location = "/winner/" + race_id
       })
     }
 
@@ -165,13 +170,13 @@ $(document).ready(function() {
   // what defines an event?
   // is event an object?
 
-  $(document).keyup(function(key) {
+  $(document).keydown(function(key) {
     switch(parseInt(key.which,10)) {
       case 81:
       movement($cells1);
         break;
 
-      case 87:
+      case 80:
       movement($cells2);
         break;
     };
