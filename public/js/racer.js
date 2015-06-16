@@ -11,49 +11,65 @@ $(document).ready(function() {
   // $cells1[player1position].className = "active";
   // $cells2[player2position].className = "active";
 
-  function Player(playernum){
+  function Player(playernum, key){
     this.playernum = playernum;
     this.position = 0;
+    this.key = key;
 
     this.move = function() {
-      var position = $('player' + playernum + '_strip' + " td.active").index();
-        $('player' + this.playernum + '_strip' + " td").eq(position).removeClass('active');
-        $('player' + this.playernum + '_strip' + " td").eq(position+1).addClass('active');
-        this.position = $('player' + this.playernum + '_strip' + " td.active").index();
+      var position = $('#player' + playernum + '_strip' + " td.active").index();
+        $('#player' + this.playernum + '_strip' + " td").eq(position).removeClass('active');
+        $('#player' + this.playernum + '_strip' + " td").eq(position+1).addClass('active');
+        this.position = $('#player' + this.playernum + '_strip' + " td.active").index();
+        // debugger
     }
   }
-  
+
   $('tr td:first-child').addClass("active");
 
   function Game(player1, player2){
     this.player1 = player1;
     this.player2 = player2;
+    // debugger
 
-    this.onKeyUp = function() {
-      switch(parseInt(key.which,10)) {
-        case 81:
-        debugger
+    this.onKeyUp = function(code) {
+      if (code == this.player1.key){//Q is player 1
         this.player1.move();
-        if(checkIfWon(1)) {
-          parseWinner($cells1, this.player2.position)
-        }
-        break;
-
-        case 80:        
+        // debugger
+        if(checkIfWon(1)){
+          // debugger
+          // this.status = 0;
+          loser_position = $('#player' + "2" + '_strip' + " td.active").index();
+          player2position = loser_position
+          // end_time = new Date().getTime();
+          // var elapsedTime = end_time - start_time;
+          // alert('Execution time: ' + elapsedTime);
+          parseWinner(player1_id, loser_position);
+          alert("Player 1 won!");}
+       }
+      else if (code == this.player2.key) {
         this.player2.move();
-        if(checkIfWon(2)) {
-          parseWinner($cells2, this.player1.position)
-        }
-        break;
-      };
+        // debugger
+        if(checkIfWon(2)){
+          // this.status = 0;
+          loser_position = $('#player' + "1" + '_strip' + " td.active").index();
+          player1position = loser_position
+          // end_time = new Date().getTime();
+          // var elapsedTime = end_time - start_time;
+          // alert('Execution time: ' + elapsedTime);
+          parseWinner(player2_id, player1position);
+          alert("Player 2 won!");}
+      }
     }
   }
 
   function checkIfWon(playernum) {
-    var position = $("#row" + id + " td.active").index();
-    var length = $("#row" + id + " td").length
-    if(position + 1 === length){
+    var position = $('player' + playernum + '_strip' + " td.active").index();
+    var length = $("#player" + playernum + "_strip td").length
+    // debugger
+    if(position + 2 === length){
       return true
+      // debugger
     }
   }
 
@@ -66,8 +82,8 @@ $(document).ready(function() {
       $.ajax({
         type: "PUT",
         url: "/race",
-        data: {"race_id": race_id, 
-               "winner_id": player1_id, 
+        data: {"race_id": race_id,
+               "winner_id": player1_id,
                "loser_index": loser_index}
         }).done(function(e){
         // e.preventDefault();
@@ -78,8 +94,8 @@ $(document).ready(function() {
       $.ajax({
         type: "PUT",
         url: "/race",
-        data: {"race_id": race_id, 
-               "winner_id": player1_id, 
+        data: {"race_id": race_id,
+               "winner_id": player1_id,
                "loser_index": loser_index}
         }).done(function(e){
         window.location = "/winner/" + race_id
@@ -87,20 +103,17 @@ $(document).ready(function() {
     }
   }
 
-  var game = new Game(new Player(1), new Player(2));
-  alert(Player(1))
 
-  $(document).keydown(function(key) {
-    switch(parseInt(key.which,10)) {
-      case 81:
-      move($cells1);
-        break;
+  var player1 = new Player("1" , 81);
+  var player2 = new Player("2" , 80);
+  var game = new Game(player1, player2);
+  // debugger
 
-      case 80:
-      move($cells2);
-        break;
-    };
-  });
+  $(document).on("keyup",(function(event){
+      var code = event.keyCode || event.which;
+      game.onKeyUp(code);
+
+    }));
 
 
 

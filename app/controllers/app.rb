@@ -37,7 +37,7 @@ put '/race' do
   @race.loser_index = params[:loser_index]
 
   @race.save
-  byebug
+  # byebug
 end
 
 get '/winner/:race_id' do
@@ -47,7 +47,6 @@ get '/winner/:race_id' do
     @loser = User.find(@race.user_races.first.player2_id).name
   else
     @loser = User.find(@race.user_races.first.player1_id).name
-  end    
+  end
   erb :winner
 end
-  
